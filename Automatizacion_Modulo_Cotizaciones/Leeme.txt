@@ -1,0 +1,7 @@
+Pruebas para el login.
+Incluye:
+1) Prueba login exitosa (happy path)
+2) Prueba login credenciales incorrectas
+3) Prueba login otp incorrecta
+4) Prueba login otp incompleta
+
