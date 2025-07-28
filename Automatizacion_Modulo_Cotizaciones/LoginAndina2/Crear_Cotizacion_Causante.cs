@@ -131,8 +131,8 @@ namespace LoginAndina2
            
 
             var xpathsFecha = ObtenerDatePickerXpaths();
-            DatePickerHelperCausanteNS.SelectDate(driver, CotizacionCausanteXpaths.DatosCausante["FechaExpedicionDocumento"], causante.FechaExpedicionDocumento, xpathsFecha);
             DatePickerHelperCausanteNS.SelectDate(driver, CotizacionCausanteXpaths.DatosCausante["FechaNacimiento"], causante.FechaNacimiento, xpathsFecha);
+            DatePickerHelperCausanteNS.SelectDate(driver, CotizacionCausanteXpaths.DatosCausante["FechaExpedicionDocumento"], causante.FechaExpedicionDocumento, xpathsFecha);
 
         }        
 

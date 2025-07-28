@@ -89,7 +89,7 @@ namespace LoginAndina2.Models
 
         // Métodos utilitarios para generación aleatoria
         private static readonly string[] TiposIdentificacion = { "CÉDULA CIUDADANIA",/* "CÉDULA EXTRANJERÍA", "NIT", "PASAPORTE", "PERMISO PERMANENCIA", "PERMISO TEMPORAL", "REGISTRO CIVIL", "TARJETA IDENTIDAD" */};
-        private static readonly string[] Parentescos = { "COMPAÑERO/A"/*, "CONYUGE", "HERMANO/A", "HIJO/A", "MADRE", "PADRE"*/ };
+        private static readonly string[] Parentescos = { "COMPAÑERO/A", "CONYUGE", "HERMANO/A", "HIJO/A", "MADRE", "PADRE" };
         private static readonly string[] Sexos = { "FEMENINO", /*"MASCULINO"*/ };
         private static readonly string[] EstadosCiviles = { /*"CASADO(A)", "DIVORCIADO(A)", "SOLTERO(A)", "UNIÓN LIBRE",*/ "VIUDO(A)" };
         private static readonly string[] EstadosBeneficiario = { /*"INVALIDO",*/  "VALIDO" };
@@ -137,7 +137,7 @@ namespace LoginAndina2.Models
             return id;
         }
         //Metodo para generar fecha
-        private static string GenerarFechaAleatoria(int anioInicio, int anioFin)
+        public static string GenerarFechaAleatoria(int anioInicio, int anioFin)
         {
             int year = random.Next(anioInicio, anioFin + 1);
             int month = random.Next(1, 13);
@@ -156,6 +156,11 @@ namespace LoginAndina2.Models
         private static readonly string[] AFPs = { "PROTECCION", "COLFONDOS", "PORVENIR", "SKANDIA" };
         private static readonly string[] Temporalidades = { /*"TEMPORAL",*/ "VITALICIO" };
         private static readonly string[] DerechosAPension = { "SI", "NO" };
+        private static readonly int numeroBeneficiarios = 2; // Ajusta el número de beneficiarios
+        
+        // Propiedad pública para acceder al número de beneficiarios
+        public static int NumeroBeneficiarios => numeroBeneficiarios;
+        
         private static readonly Random random = new Random();
 
         public static DetallesPensionYCotizacionBeneficiario GenerarAleatorio()
@@ -165,7 +170,7 @@ namespace LoginAndina2.Models
                 AFP = AFPs[random.Next(AFPs.Length)],
                 Temporalidad = Temporalidades[random.Next(Temporalidades.Length)],
                 DerechoAPension = DerechosAPension[random.Next(DerechosAPension.Length)],
-                PorcentajePension = random.Next(1, 101).ToString() // 1 a 100
+                PorcentajePension = random.Next(2, 101).ToString() // 2 a 100
             };
         }
     }
@@ -184,7 +189,7 @@ namespace LoginAndina2.Models
                 TipoCotizacion = "COTIZACION DIRECTA",
                 EstadoDocumentacion = "PENDIENTE",
                 //ESTE CAMPO SELECCIONA EL TIPO DE PENSION
-                OrigenPension = "VEJEZ", //SOBREVIVENCIA, INVALIDEZ, VEJEZ 
+                OrigenPension = "INVALIDEZ", //SOBREVIVENCIA, INVALIDEZ, VEJEZ
                 FechaFinVigencia = "2025/08/18", //Debe ser mayor a fecha actual
                 Observaciones = "Cotización de prueba",
                 VrCapital = 1000000,
@@ -210,8 +215,8 @@ namespace LoginAndina2.Models
             var causante = new DatosCausante 
             {
                 TipoIdentificacion = "CÉDULA CIUDADANIA",
-                Identificacion = /*"25348236",*/random.Next(10000000, 99999999).ToString(),
-                PrimerNombre = "JUAN",
+                Identificacion = /*"75524587",*/random.Next(10000000, 99999999).ToString(),
+                PrimerNombre = "Pedro",
                 SegundoNombre = "CARLOS",
                 PrimerApellido = "PEREZ",
                 SegundoApellido = "RAMIREZ",

@@ -83,6 +83,7 @@ namespace LoginAndina2.Models
         public string ResidenteExterior { get; set; }
         public string FechaExpedicionDocumento { get; set; }
         public string FechaNacimiento { get; set; }
+        public string PorcentajePension { get; set; }
     }
 
     }
