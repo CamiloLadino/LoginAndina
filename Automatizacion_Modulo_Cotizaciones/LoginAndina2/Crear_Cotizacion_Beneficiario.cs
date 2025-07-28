@@ -17,6 +17,7 @@ namespace LoginAndina2
         private WebDriverWait wait;
         private CreacionCotizacion creacionCotizacion;
         private CrearCotizacionCausante cotizacionCausante;
+        private DetallesPensionBeneficiario detallesPensionBeneficiario;
         private LoginPage loginPage;
         public CrearCotizacionBeneficiario(DriverChrome driver, WebDriverWait wait)
         {
@@ -45,12 +46,11 @@ namespace LoginAndina2
 
         }
 
-        private void LlenarDetallesPensionBeneficiario()
+        private void LlenarDetallesPensionBeneficiario(DetallesPensionBeneficiario detalles)
         {
             var year = DateTime.Now.Year.ToString();
             var mes = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(DateTime.Now.ToString("MMM", new CultureInfo("es-ES")));
 
-            var detalles = DetallesPensionBeneficiarioDatos.GenerarAleatorio();
             var campos = CotizacionBeneficiarioXpaths.DatosBeneficiario;
             
 
@@ -84,16 +84,15 @@ if (datosCotizacion.OrigenPension == null || datosCotizacion.OrigenPension.Trim(
                 MonthItems = "//div[contains(@class, 'q-date__months-item')]//span[@class='block']",
                 DayItems = "//div[contains(@class,'q-date__calendar-item')]//button//span[@class='block']"
             };
-            LogAndFillCampo("BENEFICIARIO", "FechaExpedicionDocumento", detalles.FechaExpedicionDocumento, () => DatePickerHelperCausante.SelectDate(chromeDriver.Driver, campos["FechaExpedicionDocumento"], detalles.FechaExpedicionDocumento, xpathsDatePicker));
             LogAndFillCampo("BENEFICIARIO", "FechaNacimiento", detalles.FechaNacimiento, () => DatePickerHelperCausante.SelectDate(chromeDriver.Driver, campos["FechaNacimiento"], detalles.FechaNacimiento, xpathsDatePicker));
+            LogAndFillCampo("BENEFICIARIO", "FechaExpedicionDocumento", detalles.FechaExpedicionDocumento, () => DatePickerHelperCausante.SelectDate(chromeDriver.Driver, campos["FechaExpedicionDocumento"], detalles.FechaExpedicionDocumento, xpathsDatePicker));
 
             Console.WriteLine("[BENEFICIARIO] Sección Detalles de Pensión completada.");
         }
 
-        private void LlenarDetallesPensionYCotizacionBeneficiario()
-        {
-            var campos = CotizacionBeneficiarioXpaths.DatosBeneficiario;
-            var detalles = DetallesPensionYCotizacionBeneficiario.GenerarAleatorio();
+        private void LlenarDetallesPensionYCotizacionBeneficiario(DetallesPensionYCotizacionBeneficiario detalles)
+{
+    var campos = CotizacionBeneficiarioXpaths.DatosBeneficiario;
 
             LogAndFillCampo("BENEFICIARIO", "AFP", detalles.AFP, () => FormHelper.SeleccionarOpcion(chromeDriver.Driver, wait, campos["AFP"], detalles.AFP, "AFP"));
             LogAndFillCampo("BENEFICIARIO", "Temporalidad", detalles.Temporalidad, () => FormHelper.SeleccionarOpcion(chromeDriver.Driver, wait, campos["Temporalidad"], detalles.Temporalidad, "Temporalidad"));
@@ -101,10 +100,11 @@ if (datosCotizacion.OrigenPension == null || datosCotizacion.OrigenPension.Trim(
             // Solo llenar estos campos si la pensión es de tipo Sobrevivencia
             var datosCotizacion = LoginAndina2.Models.CausanteDatos.datosCotizacion(); // Ajusta si la instancia de datosCotizacion está disponible de otra forma
             if (datosCotizacion.OrigenPension != null && datosCotizacion.OrigenPension.Trim().ToUpper() == "SOBREVIVENCIA")
-            {
-                LogAndFillCampo("BENEFICIARIO", "DerechoAPension", detalles.DerechoAPension, () => FormHelper.SeleccionarOpcion(chromeDriver.Driver, wait, campos["DerechoAPension"], detalles.DerechoAPension, "Derecho a pensión"));
-                LogAndFillCampo("BENEFICIARIO", "PorcentajePension", detalles.PorcentajePension, () => FormHelper.LlenarCampo(chromeDriver.Driver, wait, campos["PorcentajePension"], detalles.PorcentajePension, "% Pensión"));
-            }
+    {
+        LogAndFillCampo("BENEFICIARIO", "DerechoAPension", detalles.DerechoAPension, () => FormHelper.SeleccionarOpcion(chromeDriver.Driver, wait, campos["DerechoAPension"], detalles.DerechoAPension, "Derecho a pensión"));
+        LogAndFillCampo("BENEFICIARIO", "PorcentajePension", detalles.PorcentajePension, () => FormHelper.LlenarCampo(chromeDriver.Driver, wait, campos["PorcentajePension"], detalles.PorcentajePension, "% Pensión"));
+    }
+        
 
             Console.WriteLine("[BENEFICIARIO] Sección Detalles de Pensión y Cotización completada.");
         }
@@ -157,33 +157,216 @@ if (datosCotizacion.OrigenPension == null || datosCotizacion.OrigenPension.Trim(
 
         public async Task EjecutarCotizacionBeneficiario()
         {
-            
+
             //await loginPage.LoginSequentialAsync();
             //Console.WriteLine("Login exitoso");
             //cotizacionCausante.Test_Fase2_CrearCotizacion();
 
-            int numBeneficiarios = 1; // Cambia este valor según lo que necesites
+            int numBeneficiarios = DetallesPensionYCotizacionBeneficiario.NumeroBeneficiarios;     // Obtiene el valor de numeroBeneficiarios desde cotizacionDatos
+            bool companeroCreado = false;
+            bool conyugeCreado = false;
+
+            // Obtener fecha de nacimiento del causante
+            var datosCausante = LoginAndina2.Models.CausanteDatos.causanteDatos();
+            DateTime fechaNacimientoCausante;
+            DateTime.TryParseExact(datosCausante.FechaNacimiento, "yyyy/MM/dd", null, System.Globalization.DateTimeStyles.None, out fechaNacimientoCausante);
+
+            // Detectar si el origen de pensión es VEJEZ
+            var origenPension = datosCausante != null ? datosCausante.EstadoCausante : null;
+            origenPension = LoginAndina2.Models.CausanteDatos.datosCotizacion().OrigenPension?.Trim().ToUpper();
+
+            // Calcular porcentaje de pensión para cada beneficiario
+            int porcentajeBase = 100 / (numBeneficiarios);
+            int porcentajeRestante = 100;
+
             for (int i = 0; i <= numBeneficiarios; i++)
             {
-                Console.WriteLine($"--- Llenando formulario de beneficiario #{i} ---");                             
+                // Crear detalles de pensión y cotización beneficiario con porcentaje correcto
+                var detallesPensionYCotizacion = DetallesPensionYCotizacionBeneficiario.GenerarAleatorio();
+                if (i < numBeneficiarios)
+                {
+                    detallesPensionYCotizacion.PorcentajePension = porcentajeBase.ToString();
+                }
+                else
+                {
+                    detallesPensionYCotizacion.PorcentajePension = porcentajeRestante.ToString();
+                }
+
+                Console.WriteLine($"--- Llenando formulario de beneficiario #{i} ---");
+
+                // Generar detalles aleatorios del beneficiario
+                var detalles = DetallesPensionBeneficiarioDatos.GenerarAleatorio();
+                string parentesco = detalles.Parentesco?.Trim().ToUpper();
+
+                // Asignar porcentaje de pensión
+                porcentajeRestante -= int.Parse(detallesPensionYCotizacion.PorcentajePension);
+
+                // Llamar método de llenado con el objeto correcto
+               // LlenarDetallesPensionYCotizacionBeneficiario(detallesPensionYCotizacion);
+
+                // Si origen pensión es VEJEZ y ya hay un compañero/a o conyuge, todos los siguientes deben ser HIJO/A
+                if (origenPension == "VEJEZ" && (companeroCreado || conyugeCreado))
+                {
+                    parentesco = "HIJO/A";
+                    detalles.Parentesco = "HIJO/A";
+                }
+                // Si origen pensión es VEJEZ y parentesco generado no es permitido, forzar HIJO/A
+               /* if (origenPension == "VEJEZ" && parentesco != "HIJO/A" && parentesco != "CONYUGE" && parentesco != "COMPAÑERO/A")
+                {
+                    parentesco = "HIJO/A";
+                    detalles.Parentesco = "HIJO/A";
+                }*/
+                // Validaciones de parentesco según estado civil y SOBREVIVENCIA
+                if (origenPension == "SOBREVIVENCIA" || origenPension == "INVALIDEZ")
+                {
+                    string estadoCivil = datosCausante.EstadoCivil?.Trim().ToUpper();
+                    // Si es casado/a o unión libre, solo se permiten compañero/a, conyuge o hijo/a
+                    if ((estadoCivil == "CASADO(A)" || estadoCivil == "UNION LIBRE") && parentesco != "HIJO/A" && parentesco != "CONYUGE" && parentesco != "COMPAÑERO/A")
+                    {
+                        parentesco = "HIJO/A";
+                        detalles.Parentesco = "HIJO/A";
+                    }
+                    // Si es soltero/a, no se permite compañero/a ni conyuge
+                    if (estadoCivil == "SOLTERO(A)" && (parentesco == "CONYUGE" || parentesco == "COMPAÑERO/A"))
+                    {
+                        parentesco = "HIJO/A";
+                        detalles.Parentesco = "HIJO/A";
+                    }
+                }
+
+                // Validación de parentesco único
+                if ((parentesco == "COMPAÑERO/A" && companeroCreado) || (parentesco == "CONYUGE" && conyugeCreado))
+                {
+                    Console.WriteLine($"[VALIDACIÓN] Ya existe un beneficiario con parentesco '{detalles.Parentesco}', se omite este registro.");
+                    continue;
+                }
+                if (parentesco == "COMPAÑERO/A") companeroCreado = true;
+                if (parentesco == "CONYUGE") conyugeCreado = true;
+
+                // Validación de edad para HIJO/A
+                if (parentesco == "HIJO/A")
+                {
+                    DateTime fechaNacimiento;
+                    int edad = 100; // valor imposible para entrar al bucle
+                    int intentos = 0;
+                    while (true)
+                    {
+                        if (DateTime.TryParseExact(detalles.FechaNacimiento, "yyyy/MM/dd", null, System.Globalization.DateTimeStyles.None, out fechaNacimiento))
+                        {
+                            edad = DateTime.Now.Year - fechaNacimiento.Year;
+                            if (DateTime.Now < fechaNacimiento.AddYears(edad)) edad--;
+
+                            // Validaciones especiales para VEJEZ
+                            if (origenPension == "VEJEZ")
+                            {
+                                // Hijos no pueden ser menores de 18 ni nacer antes que el causante
+                                if (edad <= 25 && edad >= 18 && fechaNacimiento > fechaNacimientoCausante)
+                                    break;
+                                // Regenerar fecha válida: entre (hoy-25) y (hoy-18), pero después de la fecha del causante
+                                int anioMin = Math.Max(DateTime.Now.Year - 25, fechaNacimientoCausante.Year + 1);
+                                int anioMax = DateTime.Now.Year - 18;
+                                if (anioMin > anioMax)
+                                {
+                                    Console.WriteLine($"[ERROR] Rango de años inválido para HIJO/A en VEJEZ. Se omite este registro.");
+                                    continue;
+                                }
+                                detalles.FechaNacimiento = LoginAndina2.Models.DetallesPensionBeneficiarioDatos.GenerarFechaAleatoria(anioMin, anioMax);
+                            }
+                            else if (origenPension == "SOBREVIVENCIA" || origenPension == "INVALIDEZ")
+                            {
+                                // Hijos deben ser mayores de 18 años
+                                if (edad <= 25 && edad >= 18) break;
+                                // Regenerar fecha válida: entre (hoy-25) y (hoy-18)
+                                int anioMin = DateTime.Now.Year - 25;
+                                int anioMax = DateTime.Now.Year - 18;
+                                if (anioMin > anioMax)
+                                {
+                                    Console.WriteLine($"[ERROR] Rango de años inválido para HIJO/A en SOBREVIVENCIA. Se omite este registro.");
+                                    continue;
+                                }
+                                detalles.FechaNacimiento = LoginAndina2.Models.DetallesPensionBeneficiarioDatos.GenerarFechaAleatoria(anioMin, anioMax);
+                            }
+                            else
+                            {
+                                if (edad <= 25) break;
+                                detalles.FechaNacimiento = LoginAndina2.Models.DetallesPensionBeneficiarioDatos.GenerarFechaAleatoria(DateTime.Now.Year - 25, DateTime.Now.Year);
+                            }
+                            intentos++;
+                            if (intentos > 10) // Prevención de bucle infinito
+                            {
+                                Console.WriteLine($"[ERROR] No se pudo generar una fecha válida para HIJO/A tras 10 intentos. Se omite este registro.");
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[ERROR] No se pudo parsear la fecha de nacimiento '{detalles.FechaNacimiento}' para el beneficiario HIJO/A. Se omite este registro.");
+                            continue;
+                        }
+                    }
+                    // Ajustar fecha de expedición del documento: 18 años después de nacimiento
+                    if (DateTime.TryParseExact(detalles.FechaNacimiento, "yyyy/MM/dd", null, System.Globalization.DateTimeStyles.None, out fechaNacimiento))
+                    {
+                        DateTime fechaExpedicion = fechaNacimiento.AddYears(18);
+                        detalles.FechaExpedicionDocumento = fechaExpedicion.ToString("yyyy/MM/dd");
+                    }
+                }
+
+                // Validación de diferencia de edad para CONYUGE/COMPAÑERO/A
+                if (parentesco == "CONYUGE" || parentesco == "COMPAÑERO/A")
+                {
+                    DateTime fechaNacimientoBeneficiario;
+                    int intentos = 0;
+                    while (true)
+                    {
+                        if (DateTime.TryParseExact(detalles.FechaNacimiento, "yyyy/MM/dd", null, System.Globalization.DateTimeStyles.None, out fechaNacimientoBeneficiario))
+                        {
+                            int diferenciaAnios = fechaNacimientoBeneficiario.Year - fechaNacimientoCausante.Year;
+                            int edadCompanero = DateTime.Now.Year - fechaNacimientoBeneficiario.Year;
+                            if (DateTime.Now < fechaNacimientoBeneficiario.AddYears(edadCompanero)) edadCompanero--;
+                            // Debe ser mayor de 18 años y cumplir diferencia con causante
+                            if (diferenciaAnios >= 11 && edadCompanero > 18) break;
+                            // Regenerar fecha nacimiento beneficiario
+                            int anioMin = Math.Max(fechaNacimientoCausante.Year + 11, DateTime.Now.Year - 100); // límite inferior razonable
+                            int anioMax = DateTime.Now.Year - 19; // para asegurar más de 18 años
+                            if (anioMin > anioMax)
+                            {
+                                Console.WriteLine($"[ERROR] No se pudo generar un rango válido de años para {detalles.Parentesco}. Se omite este registro.");
+                                continue;
+                            }
+                            detalles.FechaNacimiento = LoginAndina2.Models.DetallesPensionBeneficiarioDatos.GenerarFechaAleatoria(anioMin, anioMax);
+                            intentos++;
+                            if (intentos > 10)
+                            {
+                                Console.WriteLine($"[ERROR] No se pudo generar una fecha válida para {detalles.Parentesco} tras 10 intentos. Se omite este registro.");
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[ERROR] No se pudo parsear la fecha de nacimiento '{detalles.FechaNacimiento}' para el beneficiario {detalles.Parentesco}. Se omite este registro.");
+                            continue;
+                        }
+                    }
+                }
 
                 // Si no es el último beneficiario, haz clic en el botón para añadir formulario
                 if (i < numBeneficiarios)
                 {
-                    LlenarDetallesPensionBeneficiario();
-                    LlenarDetallesPensionYCotizacionBeneficiario();
+                    LlenarDetallesPensionBeneficiario(detalles);
+                    LlenarDetallesPensionYCotizacionBeneficiario(detallesPensionYCotizacion);
                     LlenarDatosBancariosBeneficiario();
                     LlenarDatosContactoBeneficiario();
                     ClickAgregarBeneficiarioForm();
                     Console.WriteLine("[BENEFICIARIO] Se hizo clic en 'Agregar beneficiario'.");
                     Thread.Sleep(2000); // Espera a que cargue el nuevo formulario
-                }else
+                }
+                else
                 {
-                   Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                     //ClickAgregarBeneficiarioForm();
                     ClickGuardarForm();
                     Console.WriteLine("[BENEFICIARIO] Se hizo clic en 'Guardar'.");
-                   
                 }
             }
             
