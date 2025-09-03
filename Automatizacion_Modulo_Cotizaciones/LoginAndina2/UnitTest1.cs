@@ -53,7 +53,7 @@ namespace LoginAndina2
             
                        devToolsDomains.Network.LoadingFinished += async (sender, e) =>
                       {
-                           if (!otpRequestIds.Contains(e.RequestId))
+                           if (otpRequestIds.Contains(e.RequestId))
                            {
                                try
                                {
@@ -234,7 +234,9 @@ namespace LoginAndina2
         [TearDown]
         public void Teardown()
         {
+            devToolsSession?.Dispose();
             driver.Quit();
+            driver?.Dispose();
         }
     }
 }
