@@ -192,7 +192,7 @@ namespace LoginAndina2.Models
                 OrigenPension = "INVALIDEZ", //SOBREVIVENCIA, INVALIDEZ, VEJEZ
                 FechaFinVigencia = "2025/08/18", //Debe ser mayor a fecha actual
                 Observaciones = "Cotización de prueba",
-                VrCapital = 1000000,
+                VrCapital = 1500000,
                 VrPension = 2000000,
                 Mesadas = 13, //13 o 14
                 XPathBoton = "//span[normalize-space()='Continuar']"

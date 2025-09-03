@@ -51,7 +51,7 @@ namespace CoreAndina.Tests
 
             await loginPage.LoginSequentialAsync();
             Console.WriteLine("Login exitoso");
-            cotizacionCausante.Test_Fase2_CrearCotizacion();
+            await cotizacionCausante.Test_Fase2_CrearCotizacion();
             await cotizacionBeneficiario.EjecutarCotizacionBeneficiario();
 
             // ----- Buscar mensaje de error primero, si no existe buscar mensaje de éxito -----

@@ -52,7 +52,7 @@ namespace LoginAndina2
 
             waitHelper.EsperarElementoVisible(Pass);
             Pass.Clear();
-            Pass.SendKeys("Hola2025**");
+            Pass.SendKeys("Hola2025*");
 
         }
 
@@ -118,7 +118,7 @@ namespace LoginAndina2
                             string url = requestUrl.ToLower();
 
                             // Verificar si es una URL que podría contener OTP
-                            if (url.Contains("otp"))
+                            if (url.Contains("api/v1/otp/send-otp"))
 
                             {
                                // Console.WriteLine($"🔍 Procesando respuesta de: {requestUrl}");

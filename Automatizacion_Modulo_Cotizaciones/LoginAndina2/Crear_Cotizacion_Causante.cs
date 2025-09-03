@@ -42,7 +42,7 @@ namespace LoginAndina2
         [TearDown]
         public void TearDown()
         {
-          //  driver.Quit();
+            driver?.Dispose();
         }
 
 
@@ -68,10 +68,10 @@ namespace LoginAndina2
 
 
         [Test]
-        public void Test_Fase2_CrearCotizacion()
+        public async Task Test_Fase2_CrearCotizacion()
         {
             // Llama el flujo de la fase 1 (CreacionCotizacion)
-            creacionCotizacion.CrearCotizacionHappyPath();
+            await creacionCotizacion.CrearCotizacionHappyPath();
 
              Console.WriteLine("[TEST] Iniciando llenado de datos basicos del causante...");
             llenardatosBasicosCausante();
