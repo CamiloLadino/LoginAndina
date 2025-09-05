@@ -2,7 +2,7 @@
 using OpenQA.Selenium.Chrome;
 
 
-namespace LoginAndina2
+namespace LoginAndina2.Object
 {
 
     public class DriverChrome

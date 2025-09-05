@@ -22,16 +22,11 @@ namespace LoginAndina2
             this.wait = wait;
         }
 
-        public async Task obtenerOTP()
-        {
+        // public async Task obtenerOTP()
+        // {
 
-        }
+        // }
        
-        
-        
-        
-        
-        
         public async Task Login()
         {
             Console.WriteLine("🔍 [LOGIN] Iniciando proceso de login...");

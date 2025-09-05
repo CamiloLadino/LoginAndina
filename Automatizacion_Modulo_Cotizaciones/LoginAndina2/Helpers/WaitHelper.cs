@@ -14,14 +14,14 @@ namespace WaitHerlpers.Helpers
 
         public IWebElement EsperarElementoVisible(By locator)
         {
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
         }
 
         // Método sobrecargado que acepta IWebElement
         public IWebElement EsperarElementoVisible(IWebElement elemento)
         {
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.Until(driver => elemento.Displayed);
             return elemento;
         }

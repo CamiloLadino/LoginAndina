@@ -1,16 +1,11 @@
-using NUnit.Framework;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using System;
 using LoginAndina2.Models;
-using LoginAndina2.Helpers;
-using System.Globalization;
-using LoginAndina2;
+using LoginAndina2.Object;
 using SeleniumExtras.WaitHelpers;
 
 
-namespace CoreAndina.Tests
+namespace LoginAndina2
 {
     class TestCreacionCotizacion
     {

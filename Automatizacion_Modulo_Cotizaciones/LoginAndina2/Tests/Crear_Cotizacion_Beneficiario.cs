@@ -1,11 +1,9 @@
-using NUnit.Framework;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using System;
 using LoginAndina2.Models;
 using LoginAndina2.Helpers;
 using System.Globalization;
+using LoginAndina2.Object;
 
 namespace LoginAndina2
 {

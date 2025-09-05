@@ -8,7 +8,7 @@ using System.Text;
 using WaitHerlpers.Helpers;
 
 
-namespace LoginAndina2
+namespace LoginAndina2.Object
 {
     
 
@@ -48,10 +48,12 @@ namespace LoginAndina2
 
             waitHelper.EsperarElementoVisible(User);
             User.Clear();
+            User.Click();
             User.SendKeys("automatizacion");
 
             waitHelper.EsperarElementoVisible(Pass);
             Pass.Clear();
+            User.Click();
             Pass.SendKeys("Hola2025*");
 
         }
