@@ -1,30 +1,19 @@
 
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using WaitHerlpers.Helpers;
 
 namespace LoginAndina2.Object
 {
     public class cotizacionLocalizador
     {
-        private readonly IWebDriver driver;
-        private readonly WebDriverWait wait;
-        private readonly WebDriverWait longWait;
-        private readonly WaitHelper waitHelper;
-
-        // Timeouts
-        private const int TIMEOUT_PREDETERMINADO_SEGUNDOS = 15;
-        private const int TIMEOUT_LARGO_SEGUNDOS = 30;
+        private IWebDriver driver;
 
         public cotizacionLocalizador(IWebDriver driver)
         {
             this.driver = driver;
-            this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(TIMEOUT_PREDETERMINADO_SEGUNDOS));
-            this.longWait = new WebDriverWait(driver, TimeSpan.FromSeconds(TIMEOUT_LARGO_SEGUNDOS));
-            this.waitHelper = new WaitHelper(driver);
         }
 
         // Localizadores
+        public static By HomeLocator => By.XPath("//section[contains(@class, 'home-page')]");
 
         public static By MenuCotLocator => By.XPath("//p[i[text()='account_balance_wallet'] and contains(.,'Suscripción y cotización')]");
 

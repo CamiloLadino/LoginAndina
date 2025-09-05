@@ -2,11 +2,10 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using WaitHerlpers.Helpers;
-using System.Collections.ObjectModel;
 
 namespace LoginAndina2.Object
 {
-    public class EmisionL
+    public class emisionLocalizadores
     {
         private readonly IWebDriver driver;
         private readonly WebDriverWait wait;
@@ -17,7 +16,7 @@ namespace LoginAndina2.Object
         private const int TIMEOUT_PREDETERMINADO_SEGUNDOS = 15;
         private const int TIMEOUT_LARGO_SEGUNDOS = 30;
 
-        public EmisionL(IWebDriver driver)
+        public emisionLocalizadores(IWebDriver driver)
         {
             this.driver = driver;
             this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(TIMEOUT_PREDETERMINADO_SEGUNDOS));
@@ -26,19 +25,19 @@ namespace LoginAndina2.Object
         }
 
         // Localizadores 
-        private By HomeLocator => By.XPath("//section[contains(@class, 'home-page')]");
-        private By EmiPageLocator => By.XPath("//h3[@class='table__title' and text()='Listado de pólizas']");
-        private By TablaPolizasLocator => By.XPath("//table | //div[contains(@class, 'table')] | //div[contains(@class, 'q-table')]");
-        private By BtnEmisionLocator => By.XPath("//p[.//i[text()='article'] and contains(., 'Emisión')]");
-        private By BtnEmiPolLocator => By.XPath("//div[@class='item']/div[contains(text(), 'Emisión de Pólizas')]");
-        private By CheckPolLocator => By.XPath("//div[contains(@class, 'q-checkbox') and @role='checkbox']");
-        private By EmitPolLocator => By.XPath("/html[1]/body[1]/div[1]/div[1]/div[3]/main[1]/div[1]/div[2]/button[3]/span[2]/span[1]");
+        public static By HomeLocator => By.XPath("//section[contains(@class, 'home-page')]");
+        public static By EmiPageLocator => By.XPath("//h3[@class='table__title' and text()='Listado de pólizas']");
+        public static By TablaPolizasLocator => By.XPath("//table | //div[contains(@class, 'table')] | //div[contains(@class, 'q-table')]");
+        public static By BtnEmisionLocator => By.XPath("//p[.//i[text()='article'] and contains(., 'Emisión')]");
+        public static By BtnEmiPolLocator => By.XPath("//div[@class='item']/div[contains(text(), 'Emisión de Pólizas')]");
+        public static By CheckPolLocator => By.XPath("//div[contains(@class, 'q-checkbox') and @role='checkbox']");
+        public static By EmitPolLocator => By.XPath("/html[1]/body[1]/div[1]/div[1]/div[3]/main[1]/div[1]/div[2]/button[3]/span[2]/span[1]");
 
-        private By BtnSiLocator => By.XPath("//button[@type='button'][span//span[text()='Sí']]");
+        public static By BtnSiLocator => By.XPath("//button[@type='button'][span//span[text()='Sí']]");
 
-        private By MensajeEmiInicioLocator => By.XPath("//span[contains(text(), 'Emisión completada')]");
+        public static By MensajeEmiInicioLocator => By.XPath("//span[contains(text(), 'Emisión completada')]");
 
-        private By MensajeEmiCompleteLocator => By.XPath("//span[contains(text(), 'Emisión completada')]");
+        public static By MensajeEmiCompleteLocator => By.XPath("//span[contains(text(), 'Emisión completada')]");
 
         public void IngresarEmision()
         {
